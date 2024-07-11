@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { TemplatePTIT } from './templates/templatePTIT';
+import { handleGetRequest } from './network/get';
 //import { useError } from './error/errorContext';
 
 const windowHeight = Dimensions.get('window').height;
