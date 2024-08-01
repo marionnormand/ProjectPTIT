@@ -10,7 +10,9 @@ const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const HomePage = ({ navigation }: any) => {
-  //const { error, setError } = useError(); 
+  const [uv, setUv] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const goToHome = () => {
     navigation.navigate('homePage')
@@ -20,7 +22,21 @@ const HomePage = ({ navigation }: any) => {
     console.log('datas')
   }
 
-  
+  useEffect(() => {
+    const getUpdate = async () => {
+      try {
+        const url = 'http://192.168.31.157:5000/uv';
+        await handleGetRequest(setUv, url, 'UV_index'); 
+      } catch (error) {
+        console.error('Erreur : ', error);
+        setError('Erreur lors de la récupération des données');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUpdate();
+  }, []);
 
   return (
     <View style={styles.container}>         
@@ -28,7 +44,7 @@ const HomePage = ({ navigation }: any) => {
       <ThemedView style={styles.column}>
         <ThemedText type='title' style={styles.textTitle}>UV indice</ThemedText>
         <ThemedText type='title' style={styles.text}>You can see the UV indice in real time from the UV indice sensor</ThemedText>
-        <ThemedText style={styles.textValue}>10</ThemedText>
+        <ThemedText style={styles.textValue}>{uv !== null ? `${uv}` : 'No data available'}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.row}>
         <TouchableOpacity style={[styles.buttonCancel, styles.button]} onPress={goToHome}>

@@ -1,30 +1,66 @@
-const express = require("express")
-const port = process.env.port || 5000 
-const mysql = require('mysql'); 
+const express = require('express');
+const bodyParser = require('body-parser');
+const connection = require('./database');
 
 const app = express();
+app.use(express.json());
+//app.use(express.json());
 
-/*app.get("/", (req, res) => {
-    res.send("Booonjour")
-})*/
+//const APP_URL = 'http://projetcptit.com';
 
-app.listen(port, () => {
-    console.log("Serveur OK");
-})
+// Route pour récupérer les données depuis la base de données
+app.get("/", (req, res) => {
+    let sql = "SELECT * FROM dataptit";
+    connection.query(sql, function(err, results) {
+        if (err) {
+            console.error('Erreur lors de l\'exécution de la requête SQL:', err.stack);
+            res.status(500).send('Erreur de la base de données');
+            return;
+        }
+        res.send(results);
+    });
+});
 
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Ptit2024+',
-    database: 'dbPTIT',
-    port: 3306,
-})
+app.get("/temp", (req, res) => {
+    let sql = "SELECT Temperature FROM dataptit order by Date DESC LIMIT 1";
+    connection.query(sql, function(err, results) {
+        if (err) {
+            console.error('Erreur lors de l\'exécution de la requête SQL:', err.stack);
+            res.status(500).send('Erreur de la base de données');
+            return;
+        }
+        res.send(results);
+    });
+});
 
-connection.connect((err) => {
-    if(err) {
-        console.log("erreur de connexion : "+err.stack)
-        return; 
-    }
-    console.log("connexion reussie avec la bdd")
+app.get("/uv", (req, res) => {
+    let sql = "SELECT UV_index FROM dataptit order by Date DESC LIMIT 1";
+    connection.query(sql, function(err, results) {
+        if (err) {
+            console.error('Erreur lors de l\'exécution de la requête SQL:', err.stack);
+            res.status(500).send('Erreur de la base de données');
+            return;
+        }
+        res.send(results);
+    });
+});
+
+app.get("/rfid", (req, res) => {
+    let sql = "SELECT RFID FROM dataptit order by Date DESC LIMIT 1";
+    connection.query(sql, function(err, results) {
+        if (err) {
+            console.error('Erreur lors de l\'exécution de la requête SQL:', err.stack);
+            res.status(500).send('Erreur de la base de données');
+            return;
+        }
+        res.send(results);
+    });
+});
+
+
+// Démarrage du serveur Express
+const PORT = process.env.PORT || 5000; // Utilisation du port spécifié par l'environnement ou 5000 par défaut
+app.listen(PORT, function() {
+    console.log('Serveur Express démarré sur le port ${PORT}');
 });

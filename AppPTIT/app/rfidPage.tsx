@@ -10,7 +10,9 @@ const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const HomePage = ({ navigation }: any) => {
-  //const { error, setError } = useError(); 
+  const [rfid, setRfid] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const goToHome = () => {
     navigation.navigate('homePage')
@@ -20,6 +22,22 @@ const HomePage = ({ navigation }: any) => {
     console.log('datas')
   }
 
+  useEffect(() => {
+    const getUpdate = async () => {
+      try {
+        const url = 'http://192.168.31.157:5000/rfid';
+        await handleGetRequest(setRfid, url, 'RFID'); 
+      } catch (error) {
+        console.error('Erreur : ', error);
+        setError('Erreur lors de la récupération des données');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUpdate();
+  },[]);
+
   
 
   return (
@@ -28,7 +46,7 @@ const HomePage = ({ navigation }: any) => {
       <ThemedView style={styles.column}>
         <ThemedText type='title' style={styles.textTitle}>RFID</ThemedText>
         <ThemedText type='title' style={styles.text}>You can see the scanned RFID sensor in real time</ThemedText>
-        <ThemedText style={styles.textValue}>Younes</ThemedText>
+        <ThemedText style={styles.textValue}>{rfid !== null ? `${rfid}` : 'No data available'}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.row}>
         <TouchableOpacity style={[styles.buttonCancel, styles.button]} onPress={goToHome}>

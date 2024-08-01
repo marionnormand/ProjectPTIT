@@ -1,26 +1,25 @@
-import Toast from 'react-native-root-toast';
-
-
-const content_type = 'application/json';
-
-
-export const handleGetRequest = async (setFetchedData: React.Dispatch<React.SetStateAction<any[]>>, url:string) => {
+export const handleGetRequest = async (
+  setData: React.Dispatch<React.SetStateAction<any | null>>,
+  url: string,
+  dataType: string
+) => {
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Content-Type': content_type,
+        'Content-Type': 'application/json',
       },
     });
-    Toast.show('error : ' + response.status, {duration: Toast.durations.LONG,}) 
 
     if (!response.ok) {
-      throw new Error('La réponse du réseau n\'est pas valide ' + response.statusText);
+      throw new Error('La réponse du réseau n\'est pas valide : ' + response.statusText);
     }
 
-    const data_get = await response.json();
-    setFetchedData(data_get);
+    const data = await response.json();
+    
+    const latestData = data.length > 0 ? data[data.length - 1][dataType] : null;
+    setData(latestData);
   } catch (error) {
-    console.error('Error with fetch :', error );
+    console.error('Erreur avec fetch :', error);
   }
 };

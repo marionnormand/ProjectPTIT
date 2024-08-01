@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { TemplatePTIT } from './templates/templatePTIT';
@@ -7,20 +7,37 @@ import { handleGetRequest } from './network/get';
 //import { useError } from './error/errorContext';
 
 const windowHeight = Dimensions.get('window').height;
-const windowWidth = Dimensions.get('window').width;
 
 const HomePage = ({ navigation }: any) => {
-  //const { error, setError } = useError(); 
+  const [temperature, setTemperature] = useState<Float32Array | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const goToHome = () => {
-    navigation.navigate('homePage')
-  }
+    navigation.navigate('homePage');
+  };
 
   const goToDatas = () => {
-    console.log('datas')
-  }
+    console.log('datas');
+  };
 
-  
+  useEffect(() => {
+    const getUpdate = async () => {
+      try {
+        const url = 'http://192.168.31.157:5000/temp';
+        await handleGetRequest(setTemperature, url, 'Temperature'); 
+      } catch (error) {
+        console.error('Erreur : ', error);
+        setError('Erreur lors de la récupération des données');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUpdate();
+  }, []);
+
+
 
   return (
     <View style={styles.container}>         
@@ -28,7 +45,7 @@ const HomePage = ({ navigation }: any) => {
       <ThemedView style={styles.column}>
         <ThemedText type='title' style={styles.textTitle}>Temperature</ThemedText>
         <ThemedText type='title' style={styles.text}>You can see the temperature in real time from the temperature sensor</ThemedText>
-        <ThemedText style={styles.textValue}>20°C</ThemedText>
+        <ThemedText style={styles.textValue}>{temperature !== null ? `${temperature}°C` : 'No data available'}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.row}>
         <TouchableOpacity style={[styles.buttonCancel, styles.button]} onPress={goToHome}>
